@@ -1,3 +1,4 @@
+`timescale 10ps/1ps
 module dut_tb (
 );
     
@@ -17,17 +18,18 @@ module dut_tb (
     byte c1[2][3] = '{'{111,23,3},'{3{5}}};//数组赋值一定是'{}
     bit[31:0] d1[5] = '{5{5}};
     /* ********************************************************************以上为定宽数组 */
-
+    logic[31:0] data;
     bit [3:0] [7:0] e1 ;    //合并数组
 
     int f1[],f2[];//动态数组
 
     int q1[$],q2[$];//队列
 
-
-
-
-
+    initial begin
+        $timeformat(-9,3,"ns",8);
+        # 1 $display("%t",$realtime);
+        # 4 $display("2:%t",$realtime);
+    end
 
     initial begin
         automatic bit a1 = 5; //在initial中，需要加static或者automatic
@@ -104,15 +106,17 @@ initial begin
         a = {>>{s}};
         $displayh("result:%p",l,a );
         $display("enum %s:%2d",one.name(),one);//内建函数访问枚举变量值对应名字
-        ss1=$psprintf("%s",ss);//新建一个新的临时字符串
+        ss1=$psprintf("%s %d",ss,42);//新建一个新的临时字符串
         ss2=$psprintf("%s %s",ss,"321");//新建一个新的临时字符串
-        $display("string:%s，%s",ss1,ss2);
+        $display("string:%s %s",ss1,ss2);
         print_time;
 end
 
 initial begin:three_chapt //第三章
     bit[127:0] cmd;
+    bit[7:0] x[] ;
     int file,c;
+    x= '{8'd12,8'd22,8'd9,8'd13};
     file = $fopen("F:/vs_code_fpga/git_save/learngit/git_way.txt","r");
     if (file) begin
     while (!$feof(file)) begin
@@ -124,10 +128,29 @@ initial begin:three_chapt //第三章
         endcase
     end    
     end
-    
+    print_element(,,x);
+    print_element(.high(2),.a(x));
 end
-function void print_time;
+
+
+function void print_time;//不带参数指定的函数可以不要（）
     $display("@%0t:state=",$time);
+endfunction:print_time
+
+function automatic print_element(int low = 0, int high = 1 ,const ref bit[7:0]a[]);
+    $display("start to print element:");
+    if(high>a.size()||high <0)
+    high = a.size();
+    for(int i = low ;i < high ;i++) begin
+        $display("%2d:%3d",i,a[i]);
+    end
 endfunction
+
+task multiple_line( input bit[3:0] a,
+                    output logic b
+                    ); 
+$display("first line");
+$display("second line");
+endtask:multiple_line 
 
 endmodule

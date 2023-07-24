@@ -13,9 +13,10 @@ module top_tb (
             .tx_en(tx_en)
             );
 
-initial begin
-    
-end
 
+
+    initial begin
+
+    end
 
 endmodule
